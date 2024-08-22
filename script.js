@@ -5,14 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const mainContainer = document.getElementById('main-container');
     const aadhaarInput = document.getElementById('aadhaar-input');
-    
-// Ensure the page reloads if revisited
-window.addEventListener('pageshow', function(event) {
-if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-    window.location.reload();
-}
-});
 
+    // Ensure the page reloads if revisited
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+            window.location.reload();
+        }
+    });
 
     let attemptCount = 0;
     const requiredAttempts = 2;
@@ -60,12 +59,17 @@ if (event.persisted || performance.getEntriesByType("navigation")[0].type === "b
             optionDiv.style.backgroundImage = `url('${imgSrc}')`;
             optionDiv.dataset.correct = index === referenceIndex;
             optionDiv.draggable = true;
+
+            // Support for both desktop and mobile
             optionDiv.addEventListener('dragstart', dragStart);
+            optionDiv.addEventListener('touchstart', touchStart);
             optionContainer.appendChild(optionDiv);
         });
 
         referenceImage.addEventListener('dragover', dragOver);
         referenceImage.addEventListener('drop', drop);
+        referenceImage.addEventListener('touchmove', touchMove);
+        referenceImage.addEventListener('touchend', touchEnd);
     }
 
     function dragStart(event) {
@@ -80,6 +84,33 @@ if (event.persisted || performance.getEntriesByType("navigation")[0].type === "b
         event.preventDefault();
         const isCorrect = event.dataTransfer.getData('text') === 'true';
         handleCaptchaResult(isCorrect);
+    }
+
+    // Mobile touch event handlers
+    let selectedElement = null;
+
+    function touchStart(event) {
+        selectedElement = event.target;
+    }
+
+    function touchMove(event) {
+        event.preventDefault(); // Prevent scrolling
+        const touch = event.touches[0];
+        const referenceImage = document.getElementById('reference-image');
+        const rect = referenceImage.getBoundingClientRect();
+
+        if (
+            touch.clientX >= rect.left &&
+            touch.clientX <= rect.right &&
+            touch.clientY >= rect.top &&
+            touch.clientY <= rect.bottom
+        ) {
+            handleCaptchaResult(selectedElement.dataset.correct === 'true');
+        }
+    }
+
+    function touchEnd() {
+        selectedElement = null;
     }
 
     function handleCaptchaResult(isCorrect) {
@@ -101,7 +132,7 @@ if (event.persisted || performance.getEntriesByType("navigation")[0].type === "b
         } else {
             attemptCount++;
             resultMessage.textContent = 'Incorrect selection. Please try again.';
-            if (attemptCount >= 2) { // Limit to 3 wrong attempts before refresh
+            if (attemptCount >= 2) { // Limit to 2 wrong attempts before refresh
                 alert('Too many incorrect attempts. Reloading the page.');
                 location.reload();
             }
