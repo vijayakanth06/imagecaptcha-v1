@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aadhar Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="header">
+            <img src="aadhar1.svg" alt="UIDAI Logo">
+        </div>
+        <h2>Login via OTP</h2>
+        <form id="loginForm" action="target.html">
+           
+            <input type="text" name="honeypot" id="honeypot" label="honeypot" style="display: none;">
+
+            <input id="aadhaar-input" name="aadno" type="text" placeholder="Enter 12-digit Aadhar Number" pattern="\d{12}" title="Please enter a 12-digit Aadhar number" maxlength="12" required>
+            <div class="checkbox-container">
+                <input type="checkbox" id="captcha-checkbox">
+                <label for="captcha-checkbox">I am not a robot</label>
+            </div>
+            <button type="submit" id="submitBtn" disabled>Login via OTP</button>
+        </form>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <div class="captcha-container">
+                <p>Drag and drop the similar image here</p>
+                <div id="reference-image" class="captcha-image"></div>
+                <div id="option-container" class="option-container"></div>
+            </div>
+            <div id="result-message" class="result-message"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
