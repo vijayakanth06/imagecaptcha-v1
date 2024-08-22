@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const mainContainer = document.getElementById('main-container');
     const aadhaarInput = document.getElementById('aadhaar-input');
-    var honeypot = document.getElementById('honeypot');
-   
+    const honeypot = document.getElementById('honeypot');
 
     let cursorData = [];
     let successfulAttempts = 0;
@@ -14,13 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let failedAttempts = 0;
     let lastX = null, lastY = null, lastTime = null;
 
-    // Ensure the page reloads if revisited
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-            window.location.reload();
-        }
-    });
-
+   // Ensure the page reloads if revisited
+   window.addEventListener('pageshow', function(event) {
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        window.location.reload();
+    }
+});
     aadhaarInput.addEventListener('input', function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 12);
         if (this.value.length === 12) {
@@ -161,22 +159,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendCursorDataToServer() {
-        const csvContent = "x,y,speed\n" + cursorData.map(d => `${d.x},${d.y},${d.speed}`).join("\n");
-
-        fetch('http://localhost:8000/predict', {  // Ensure this matches the port where Flask is running
+        fetch('http://localhost:3000/send-data', {  // Ensure this matches the port where Express is running
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ csvData: csvContent }),
+            body: JSON.stringify({ cursorData: cursorData }),
         })
         .then(response => response.json())
         .then(data => {
-            if (data.result === 'human') {
-                window.location.href = 'target.html';
-            } else {
-                alert('Bot detected! The page will reload.');
-                window.location.reload();
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else if (data.message) {
+                alert(data.message);
             }
         })
         .catch(error => {
@@ -189,9 +184,10 @@ document.addEventListener('DOMContentLoaded', () => {
             popup.style.display = 'flex';
             setupCaptcha();
             mainContainer.classList.add('blur');
+            setupCaptcha();
         } else {
             e.preventDefault();
-            alert('Please enter a valid 12-digit Aadhar number first.');
+            alert('You must enter 12 numbers.');
             captchaCheckbox.checked = false;
         }
     });

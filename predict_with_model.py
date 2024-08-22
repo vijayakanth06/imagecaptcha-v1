@@ -7,12 +7,20 @@ model = joblib.load('refined_cursor_model.pkl')
 scaler = joblib.load('refined_scaler.pkl')
 
 def process_file(file_path):
-    df = pd.read_csv(file_path, header=None, names=['x', 'y', 'timestamp'])
+    df = pd.read_csv(file_path, header=None, names=['x', 'y', 'speed'])
+
+    # Convert x, y, and timestamp columns to numeric (if needed)
+    df['x'] = pd.to_numeric(df['x'], errors='coerce')
+    df['y'] = pd.to_numeric(df['y'], errors='coerce')
+    df['speed'] = pd.to_numeric(df['speed'], errors='coerce')
+
+    # Handle any missing or invalid values after conversion
+    df = df.dropna()
 
     # Feature Engineering for test data
     df['x_freq'] = df['x'].map(df['x'].value_counts())
     df['y_freq'] = df['y'].map(df['y'].value_counts())
-    df['speed'] = df['timestamp'].diff().fillna(0)
+    df['speed'] = df['speed'].diff().fillna(0)
     df['speed_variability'] = df['speed'].rolling(window=3).std().fillna(0)
     df['acceleration'] = df['speed'].diff().fillna(0)
     df['x_movement'] = df['x'].diff().fillna(0)

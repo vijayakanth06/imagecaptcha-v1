@@ -3,9 +3,8 @@ const { exec } = require('child_process');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs');
 const path = require('path');
-
 const app = express();
-const port = 3000;
+const port = 3000;  // Port for the Express server
 
 // Middleware for parsing JSON request bodies
 app.use(express.json());
@@ -22,30 +21,38 @@ app.use(limiter);
 
 app.post('/send-data', (req, res) => {
     if (!req.body.cursorData) {
+        console.error('No cursor data received.');
         return res.status(400).json({ message: 'No data received.' });
     }
 
     const cursorData = req.body.cursorData;
-    const csvFilePath = path.join(__dirname, 'cursorData.csv');
+    const filePath = path.join(__dirname, 'data.csv');
 
     // Convert cursor data to CSV format
-    const csvData = cursorData.map(item => `${item.x},${item.y}`).join('\n');
-    const csvHeader = 'x,y\n'; // Add headers if needed
+    const csvData = cursorData.map(item => `${item.x},${item.y},${item.speed}`).join('\n');
+   
+
+    console.log('Saving CSV file...');
 
     // Save cursor data to CSV file
-    fs.writeFile(csvFilePath, csvHeader + csvData, (err) => {
+    fs.writeFile(filePath, 'x,y,speed\n' + csvData, (err) => {
         if (err) {
-            console.error(`Error saving file: ${err}`);
-            return res.status(500).json({ message: 'Error saving data.' });
+            console.error('Error saving CSV:', err);
+            res.status(500).send('Error processing data');
+            return;
         }
 
+      
+
         // Execute the Python script
-        const scriptPath = path.join(__dirname, 'predict_with_model.py');
-        exec(`python3 ${scriptPath} ${csvFilePath}`, (err, stdout, stderr) => {
+        
+        exec(`python3 ${path.join(__dirname, 'predict_with_model.py')} ${filePath}`, (error, stdout, stderr) => {
             if (err) {
                 console.error(`Error executing script: ${stderr}`);
                 return res.status(500).json({ message: 'Error processing data.' });
             }
+
+            console.log('Python script output:', stdout);
 
             const isBot = stdout.includes('Bot detected');
             if (isBot) {
@@ -55,6 +62,20 @@ app.post('/send-data', (req, res) => {
             }
         });
     });
+});
+
+
+app.use((req, res, next) => {
+    const clientIp = req.ip;
+    const currentTime = Date.now();
+    const timeSinceLastRequest = currentTime - (requestTimestamps[clientIp] || 0);
+
+    if (timeSinceLastRequest < 5000) {  // Block requests within 5 seconds from the same IP
+        res.status(429).send('Too many requests - please wait a moment.');
+    } else {
+        requestTimestamps[clientIp] = currentTime;
+        next();
+    }
 });
 
 app.listen(port, () => {
