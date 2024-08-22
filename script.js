@@ -1,80 +1,131 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const checkbox = document.getElementById('captcha-checkbox');
+    const captchaCheckbox = document.getElementById('captcha-checkbox');
     const popup = document.getElementById('popup');
-    const closePopup = document.getElementById('close-popup');
-    const submitCaptcha = document.getElementById('submit-captcha');
-    const resultMessage = document.getElementById('result-message');
-    const optionContainer = document.getElementById('option-container');
-    const referenceImage = document.getElementById('reference-image');
     const submitBtn = document.getElementById('submitBtn');
+    const loginForm = document.getElementById('loginForm');
+    const mainContainer = document.getElementById('main-container');
+    const aadhaarInput = document.getElementById('aadhaar-input');
+    
+// Ensure the page reloads if revisited
+window.addEventListener('pageshow', function(event) {
+if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+    window.location.reload();
+}
+});
+
 
     let attemptCount = 0;
-    const maxAttempts = 2;
+    const requiredAttempts = 2;
+    let successfulAttempts = 0;
     const images = [
-        'a1.jpg', 'a2.jpg', 'a3.jpg', 'a4.jpg', 'a5.jpg', 'a6.jpg', 'a7.jpg', 'a8.jpg', 'a9.jpg', 'a10.jpg', 'a11.jpg', 'a12.jpg', 'a13.jpg', 'a14.jpg'
+        'a1.jpg', 'a2.jpg', 'a3.jpg', 'a4.jpg', 'a5.jpg', 'a6.jpg', 'a7.jpg', 'a8.jpg', 'a9.jpg', 'a10.jpg',
+        'a11.jpg', 'a12.jpg', 'a13.jpg', 'a14.jpg'
     ];
 
-    function setupCaptcha() {
-        optionContainer.innerHTML = '';
-        const shuffledImages = [...images].sort(() => 0.5 - Math.random());
-        const referenceIndex = Math.floor(Math.random() * 3);
-        const correctImage = shuffledImages[referenceIndex];
-        referenceImage.style.backgroundImage = `url(${correctImage})`;
+    // Allow only digits in the Aadhaar input field
+    aadhaarInput.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 12); // Replace non-digits and limit to 12 digits
 
-        shuffledImages.slice(0, 3).forEach((img) => {
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'captcha-image';
-            imgDiv.style.backgroundImage = `url(${img})`;
-            imgDiv.draggable = true;
-
-            imgDiv.addEventListener('dragstart', (event) => {
-                event.dataTransfer.setData('text/plain', img);
-            });
-
-            optionContainer.appendChild(imgDiv);
-        });
-
-        referenceImage.addEventListener('dragover', (event) => {
-            event.preventDefault();
-        });
-
-        referenceImage.addEventListener('drop', (event) => {
-            event.preventDefault();
-            const draggedImage = event.dataTransfer.getData('text/plain');
-            if (draggedImage === correctImage) {
-                resultMessage.textContent = 'Verification successful!';
-                submitBtn.disabled = false;
-                popup.style.display = 'none';
-            } else {
-                resultMessage.textContent = 'Verification failed. Please try again.';
-                attemptCount++;
-                if (attemptCount >= maxAttempts) {
-                    alert('Too many failed attempts. Please refresh the page and try again.');
-                    submitBtn.disabled = true;
-                    popup.style.display = 'none';
-                } else {
-                    setupCaptcha();
-                }
-            }
-        });
-    }
-
-    checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-            popup.style.display = 'flex';
-            setupCaptcha();
+        // Mark the input field as invalid if it doesn't have exactly 12 digits
+        if (this.value.length === 12) {
+            this.classList.remove('invalid');
         } else {
-            submitBtn.disabled = true;
+            this.classList.add('invalid');
         }
     });
 
-    closePopup.addEventListener('click', () => {
-        popup.style.display = 'none';
-        checkbox.checked = false;
-        submitBtn.disabled = true;
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function setupCaptcha() {
+        const optionContainer = document.getElementById('option-container');
+        const referenceImage = document.getElementById('reference-image');
+        const resultMessage = document.getElementById('result-message');
+
+        optionContainer.innerHTML = '';
+        resultMessage.textContent = '';
+        const shuffledImages = shuffleArray(images);
+        const referenceIndex = Math.floor(Math.random() * 3);
+        const options = shuffledImages.slice(0, 3);
+
+        referenceImage.style.backgroundImage = `url('${options[referenceIndex]}')`;
+        options.forEach((imgSrc, index) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.classList.add('captcha-image');
+            optionDiv.style.backgroundImage = `url('${imgSrc}')`;
+            optionDiv.dataset.correct = index === referenceIndex;
+            optionDiv.draggable = true;
+            optionDiv.addEventListener('dragstart', dragStart);
+            optionContainer.appendChild(optionDiv);
+        });
+
+        referenceImage.addEventListener('dragover', dragOver);
+        referenceImage.addEventListener('drop', drop);
+    }
+
+    function dragStart(event) {
+        event.dataTransfer.setData('text', event.target.dataset.correct);
+    }
+
+    function dragOver(event) {
+        event.preventDefault();
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        const isCorrect = event.dataTransfer.getData('text') === 'true';
+        handleCaptchaResult(isCorrect);
+    }
+
+    function handleCaptchaResult(isCorrect) {
+        const resultMessage = document.getElementById('result-message');
+
+        if (isCorrect) {
+            successfulAttempts++;
+            if (successfulAttempts >= requiredAttempts) {
+                captchaCheckbox.disabled = true;
+                captchaCheckbox.checked = true;
+                captchaCheckbox.style.accentColor = '#007bff'; // Change checkbox color to blue
+                submitBtn.disabled = false;
+                popup.style.display = 'none';
+                mainContainer.classList.remove('blur');
+                successfulAttempts = 0; // Reset attempts
+            } else {
+                setupCaptcha(); // Refresh captcha for the second round
+            }
+        } else {
+            attemptCount++;
+            resultMessage.textContent = 'Incorrect selection. Please try again.';
+            if (attemptCount >= 2) { // Limit to 3 wrong attempts before refresh
+                alert('Too many incorrect attempts. Reloading the page.');
+                location.reload();
+            }
+        }
+    }
+
+    // Event Listeners
+    captchaCheckbox.addEventListener('click', (e) => {
+        if (captchaCheckbox.checked && aadhaarInput.value.length === 12) {
+            popup.style.display = 'flex';
+            setupCaptcha();
+            mainContainer.classList.add('blur');
+        } else {
+            e.preventDefault();
+            alert('Please enter a valid 12-digit Aadhar number first.');
+            captchaCheckbox.checked = false;
+        }
     });
 
-    submitCaptcha.addEventListener('click', () => {
-        resultMessage.textContent = 'Please complete the CAPTCHA to continue.';
+    // Disable form submission until CAPTCHA is passed
+    loginForm.addEventListener('submit', (e) => {
+        if (submitBtn.disabled) {
+            e.preventDefault();
+            alert('Please complete the CAPTCHA before submitting.');
+        }
     });
 });
