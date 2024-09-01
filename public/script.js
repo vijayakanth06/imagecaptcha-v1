@@ -28,6 +28,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+     // Session Timeout (3 minutes)
+     let sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
+     let sessionTimer = setTimeout(() => {
+         alert('Session expired. Please try again.');
+         window.location.reload();
+     }, sessionTimeout);
+     // Reset session timeout on user activity
+     document.onmousemove = resetTimer;
+     document.onkeypress = resetTimer;
+
+     function resetTimer() {
+         clearTimeout(sessionTimer);
+         sessionTimer = setTimeout(() => {
+             alert('Session expired. Please try again.');
+             window.location.reload();
+         }, sessionTimeout);
+     }
+
+
     // Record cursor data including speed
     document.addEventListener('mousemove', (event) => {
         if (!captchaCheckbox.checked) {
