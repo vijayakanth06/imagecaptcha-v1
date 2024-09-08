@@ -44,8 +44,8 @@ app.post('/send-data', (req, res) => {
                 return res.status(500).json({ message: 'Error processing data.' });
                 window.location.reload();
             }
+            console.log('Script output successful');
 
-            console.log('Python script output:', stdout);
 
             const isBot = stdout.includes('Bot detected');
             if (isBot) {
