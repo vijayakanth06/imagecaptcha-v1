@@ -38,7 +38,7 @@ app.post('/send-data', (req, res) => {
 
         // Execute the Python script
         
-        exec(`python3 ${path.join(__dirname, 'predict_with_model.py')} ${filePath}`, (error, stdout, stderr) => {
+        exec(`python3 ${path.join(__dirname, 'predict_with_model.py')} ${filePath}`, (err, stdout, stderr) => {
             if (err) {
                 console.error(`Error executing script: ${stderr}`);
                 return res.status(500).json({ message: 'Error processing data.' });
@@ -53,6 +53,8 @@ app.post('/send-data', (req, res) => {
                 res.json({ redirect: 'target.html' });
             }
         });
+
+        
     });
 });
 

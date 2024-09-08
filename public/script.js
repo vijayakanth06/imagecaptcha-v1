@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const mainContainer = document.getElementById('main-container');
     const aadhaarInput = document.getElementById('aadhaar-input');
-    const honeypot = document.getElementById('honeypot');
 
     let cursorData = [];
     let successfulAttempts = 0;
@@ -161,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.disabled = false;
                 popup.style.display = 'none';
                 mainContainer.classList.remove('blur');
-                sendCursorDataToServer();
+                
             } else {
                 setupCaptcha();
             }
@@ -219,6 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
               event.preventDefault();
               alert('BOT detected!');
               location.reload();
+            }
+            else{
+                sendCursorDataToServer();
             }
           
     });
