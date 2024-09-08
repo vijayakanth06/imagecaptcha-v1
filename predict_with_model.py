@@ -35,7 +35,7 @@ def process_file(file_path):
     predictions_numeric = [1 if p == 'human' else 0 for p in predictions]
 
     # Determine the final single prediction
-    final_prediction = "human" if sum(predictions_numeric) > len(predictions_numeric) / 2 else "bot"
+    final_prediction = "human" if sum(predictions_numeric) > len(predictions_numeric) / 2 else "Bot detected"
 
     return final_prediction
 

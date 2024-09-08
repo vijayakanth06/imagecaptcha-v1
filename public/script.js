@@ -212,15 +212,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loginForm.addEventListener('submit', (e) => {
-        if (submitBtn.disabled) {
-            if (honeypot.value) {
-                // If honeypot field is filled, prevent form submission
-                event.preventDefault();
-                alert('Bot detected! Form submission blocked.');
-                
+        
+            var honeypot = document.getElementById('honeypot').value;
+            if (honeypot) {
+              // If the honeypot field is filled, prevent form submission
+              event.preventDefault();
+              alert('BOT detected!');
+              location.reload();
             }
-            e.preventDefault();
-            alert('Please complete the CAPTCHA before submitting.');
-        }
+          
     });
 });
