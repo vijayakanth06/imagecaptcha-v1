@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.disabled = false;
                 popup.style.display = 'none';
                 mainContainer.classList.remove('blur');
+                sendCursorDataToServer();
                 
             } else {
                 setupCaptcha();
@@ -218,9 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
               event.preventDefault();
               alert('BOT detected!');
               location.reload();
-            }
-            else{
-                sendCursorDataToServer();
             }
           
     });

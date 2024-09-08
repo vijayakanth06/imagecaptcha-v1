@@ -15,9 +15,8 @@
         <form id="loginForm" action="target.html">
            
            <!-- Honeypot field (hidden from users) -->
-             <div  style="display: none;">
-                <label for="honeypot">Leave this field empty:</label>
-                <input type="text" id="honeypot" name="honeypot">
+             <div>
+                <input type="hidden" id="honeypot" name="honeypot">
               </div>
 
             <input id="aadhaar-input" name="aadno" type="text" placeholder="Enter 12-digit Aadhar Number" pattern="\d{12}" title="Please enter a 12-digit Aadhar number" maxlength="12" required>
