@@ -42,6 +42,7 @@ app.post('/send-data', (req, res) => {
             if (err) {
                 console.error(`Error executing script: ${stderr}`);
                 return res.status(500).json({ message: 'Error processing data.' });
+                window.location.reload();
             }
 
             console.log('Python script output:', stdout);
