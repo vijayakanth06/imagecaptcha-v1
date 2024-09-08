@@ -134,6 +134,28 @@ button:disabled {
 input[type="checkbox"]:disabled {
     accent-color: #007bff;
 }
+/* Add this to your existing CSS */
+button {
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:disabled {
+    background-color: #90CAF9;
+    cursor: not-allowed;
+}
+
+/* Ensure the 'Try Another Way' button has some distinct styling if needed */
+#tryAnotherWayBtn, #audio-tryAnotherWayBtn {
+    background-color: #53a0e3;
+}
 
 @media only screen and (max-width: 600px) {
     .container {
