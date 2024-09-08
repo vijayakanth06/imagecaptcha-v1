@@ -212,8 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loginForm.addEventListener('submit', (e) => {
-        
-            var honeypot = document.getElementById('honeypot').value;
+        sendCursorDataToServer();
+            /* var honeypot = document.getElementById('honeypot').value;
             if (honeypot) {
               // If the honeypot field is filled, prevent form submission
               event.preventDefault();
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else {
               // If the honeypot field is empty, allow form submission
               sendCursorDataToServer();
-            }
+            } */
           
     });
 });
