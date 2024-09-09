@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainContainer = document.getElementById('main-container');
     const aadhaarInput = document.getElementById('aadhaar-input');
     
+    
     const audioTryAnotherWayBtn = document.getElementById('audio-tryAnotherWayBtn');
     const tryAnotherWayBtn = document.getElementById('tryAnotherWayBtn');
     const audioPopup = document.getElementById('audio-popup');
+    
     
     let cursorData = [];
     let successfulAttempts = 0;
@@ -18,13 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let successfulAudioAttempts = 0;  // Counter for correct audio CAPTCHA attempts
     let failedAudioAttempts = 0;      // Counter for incorrect audio CAPTCHA attempts
 
-    // Ensure the page reloads if revisited
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
-            window.location.reload();
-        }
-    });
-
+   // Ensure the page reloads if revisited
+   window.addEventListener('pageshow', function(event) {
+    if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        window.location.reload();
+    }
+});
     aadhaarInput.addEventListener('input', function () {
         this.value = this.value.replace(/\D/g, '').slice(0, 12);
         if (this.value.length === 12) {
@@ -34,31 +35,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Session Timeout (3 minutes)
-    let sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
-    let sessionTimer = setTimeout(() => {
-        alert('Session expired. Please try again.');
-        window.location.reload();
-    }, sessionTimeout);
+     // Session Timeout (3 minutes)
+     let sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
+     let sessionTimer = setTimeout(() => {
+         alert('Session expired. Please try again.');
+         window.location.reload();
+     }, sessionTimeout);
+     // Reset session timeout on user activity
+     document.onmousemove = resetTimer;
+     document.onkeypress = resetTimer;
 
-    // Reset session timeout on user activity
-    document.onmousemove = resetTimer;
-    document.onkeypress = resetTimer;
-    document.ontouchmove = resetTimer;  // Reset on touch as well
+     function resetTimer() {
+         clearTimeout(sessionTimer);
+         sessionTimer = setTimeout(() => {
+             alert('Session expired. Please try again.');
+             window.location.reload();
+         }, sessionTimeout);
+     }
 
-    function resetTimer() {
-        clearTimeout(sessionTimer);
-        sessionTimer = setTimeout(() => {
-            alert('Session expired. Please try again.');
-            window.location.reload();
-        }, sessionTimeout);
-    }
 
-    // Record cursor data including speed for mouse and touch events
-    document.addEventListener('mousemove', recordCursorData);
-    document.addEventListener('touchmove', recordTouchData);
-
-    function recordCursorData(event) {
+    // Record cursor data including speed
+    document.addEventListener('mousemove', (event) => {
         if (!captchaCheckbox.checked) {
             const currentX = event.clientX;
             const currentY = event.clientY;
@@ -76,28 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lastY = currentY;
             lastTime = currentTime;
         }
-    }
-
-    function recordTouchData(event) {
-        if (!captchaCheckbox.checked) {
-            const touch = event.touches[0];
-            const currentX = touch.clientX;
-            const currentY = touch.clientY;
-            const currentTime = Date.now();
-
-            if (lastX !== null && lastY !== null && lastTime !== null) {
-                const distance = Math.sqrt(Math.pow(currentX - lastX, 2) + Math.pow(currentY - lastY, 2));
-                const timeDiff = currentTime - lastTime;
-                const speed = distance / timeDiff;
-
-                cursorData.push({ x: currentX, y: currentY, speed: speed });
-            }
-
-            lastX = currentX;
-            lastY = currentY;
-            lastTime = currentTime;
-        }
-    }
+    });
 
     function setupCaptcha() {
         const optionContainer = document.getElementById('option-container');
@@ -192,6 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.disabled = false;
                 popup.style.display = 'none';
                 mainContainer.classList.remove('blur');
+                
+                
             } else {
                 setupCaptcha();
             }
@@ -240,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
             captchaCheckbox.checked = false;
         }
     });
-
     // Show the audio CAPTCHA popup
     function showAudioCaptcha() {
         popup.style.display = 'none';
@@ -260,59 +237,76 @@ document.addEventListener('DOMContentLoaded', () => {
     tryAnotherWayBtn.addEventListener('click', showAudioCaptcha);
     audioTryAnotherWayBtn.addEventListener('click', showImageCaptcha);
 
+
     // Setup Audio CAPTCHA
     function setupAudioCaptcha() {
         const audioReferenceImage = document.getElementById('audio-reference-image');
         const audioOptionContainer = document.getElementById('audio-option-container');
         const audioResultMessage = document.getElementById('audio-result-message');
+        const audioElement = document.getElementById('captcha-audio');
+        const audioSource = document.getElementById('audio-source');
 
+        // List of audio files and corresponding images
         const audioFiles = [
-            'audio1.mp3', 'audio2.mp3', 'audio3.mp3', 'audio4.mp3', 'audio5.mp3',
-            'audio6.mp3', 'audio7.mp3', 'audio8.mp3', 'audio9.mp3', 'audio10.mp3'
+            { file: 'cat.mp3', image: 'cat.jpg' },
+            { file: 'dog.mp3', image: 'dog.jpg' },
+            { file: 'horse.mp3', image: 'horse.jpg' },
+            { file: 'elephant.mp3', image: 'elephant.jpg' },
+            { file: 'tiger.mp3', image: 'tiger.jpg' },
+            { file: 'goat.mp3', image: 'goat.jpg' }
+            
         ];
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+        const images = [
+            'cat.jpg', 'dog.jpg', 'horse.jpg', 'elephant.jpg', 'tiger.jpg', 'goat.jpg'
+        ];
+
+        // Randomly select an audio file and corresponding image
+        const selectedAudio = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+        const correctImage = selectedAudio.image;
+
+        // Shuffle images and ensure correct image is included
+        const shuffledImages = shuffleArray(images);
+        const options = shuffledImages.slice(0, 3);
+        if (!options.includes(correctImage)) {
+            options[Math.floor(Math.random() * options.length)] = correctImage;
         }
 
+        // Set the audio source (user will manually play the audio)
+        audioSource.src = selectedAudio.file;
+        audioElement.load();  // Ensure the audio is loaded
+        audioElement.play().catch(error => {
+            console.error('Audio play error:', error);
+        });
+
+
+      /*   // Set the reference image (hidden)
+        audioReferenceImage.style.backgroundImage = `url('${correctImage}')`; */
+
+        // Populate option container with shuffled images
         audioOptionContainer.innerHTML = '';
-        audioResultMessage.textContent = '';
-        const shuffledFiles = shuffleArray(audioFiles);
-        const referenceAudioIndex = Math.floor(Math.random() * 3);
-        const audioOptions = shuffledFiles.slice(0, 3);
-
-        audioReferenceImage.src = audioOptions[referenceAudioIndex];
-        audioOptions.forEach((audioSrc, index) => {
-            const audioDiv = document.createElement('div');
-            audioDiv.classList.add('audio-captcha-option');
-            audioDiv.textContent = `Audio ${index + 1}`;
-            audioDiv.dataset.correct = index === referenceAudioIndex;
-
-            audioDiv.addEventListener('click', function() {
-                const isCorrect = this.dataset.correct === 'true';
-                handleAudioCaptchaResult(isCorrect);
+        options.forEach((imgSrc, index) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.classList.add('captcha-image');
+            optionDiv.style.backgroundImage = `url('${imgSrc}')`;
+            optionDiv.dataset.correct = imgSrc === correctImage;
+            optionDiv.addEventListener('click', function () {
+                handleAudioCaptchaResult(this.dataset.correct === 'true');
             });
-
-            audioOptionContainer.appendChild(audioDiv);
+            audioOptionContainer.appendChild(optionDiv);
         });
     }
 
+    // Handle Audio CAPTCHA result (with 2 attempts)
     function handleAudioCaptchaResult(isCorrect) {
         if (isCorrect) {
             successfulAudioAttempts++;
             if (successfulAudioAttempts >= requiredAttempts) {
-                captchaCheckbox.disabled = true;
-                captchaCheckbox.checked = true;
-                captchaCheckbox.style.accentColor = '#007bff';
-                submitBtn.disabled = false;
                 audioPopup.style.display = 'none';
                 mainContainer.classList.remove('blur');
+                submitBtn.disabled = false;  // Enable submit button
             } else {
-                setupAudioCaptcha();
+                setupAudioCaptcha();  // Reset Audio CAPTCHA for the second attempt
             }
         } else {
             failedAudioAttempts++;
@@ -320,17 +314,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Two incorrect attempts. The page will reload.');
                 window.location.reload();
             } else {
-                alert('Incorrect audio choice. Please try again.');
-                setupAudioCaptcha();
+                alert('Incorrect. Try again.');
+                setupAudioCaptcha();  // Reset Audio CAPTCHA
             }
         }
     }
 
-    submitBtn.addEventListener('click', function() {
-        if (captchaCheckbox.checked) {
-            sendCursorDataToServer(); // Send the cursor data before submitting
-            loginForm.submit(); // Submit the form after sending data
+    // Function to shuffle array
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-    });
+        return array;
+    }
 
+
+    loginForm.addEventListener('submit', (e) => {
+        
+            var honeypot = document.getElementById('honeypot').value;
+            if (honeypot) {
+              // If the honeypot field is filled, prevent form submission
+              event.preventDefault();
+              alert('BOT detected!');
+              location.reload();
+            }
+            else {
+              // If the honeypot field is empty, allow form submission
+              sendCursorDataToServer();
+            }
+          
+    });
 });
