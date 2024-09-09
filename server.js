@@ -74,6 +74,7 @@ app.post('/send-data', (req, res) => {
             if (isBot) {
                 return res.status(403).json({ message: 'Bot detected. Please try again.' });
             } else {
+                console.log('success');
                 res.json({ redirect: 'target.html' });
             }
         });
