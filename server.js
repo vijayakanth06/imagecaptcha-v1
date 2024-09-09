@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 let requestCount = {};
-const MAX_REQUESTS = 2;
+const MAX_REQUESTS = 5;
 const BLOCK_DURATION = 3 * 60 * 1000; // Block IP for 3 minutes
 
 app.use((req, res, next) => {
