@@ -25,8 +25,7 @@ def process_file(file_path):
 
     # Make predictions
     predictions = model.predict(features_scaled)
-    print(predictions)
-
+    
     # Convert predictions to numerical values (if needed)
     predictions_numeric = [1 if p == 'human' else 0 for p in predictions]
 
