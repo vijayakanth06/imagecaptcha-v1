@@ -3,9 +3,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const port = process.env.PORT || 3000;  // Use environment port for Vercel
-
-
+const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
