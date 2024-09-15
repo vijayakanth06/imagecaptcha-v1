@@ -187,35 +187,33 @@ document.addEventListener('DOMContentLoaded', () => {
     function sendCursorDataToServer() {
         fetch('/send-data', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+            'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ cursorData: cursorData }),
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`Server responded with status ${response.status}: ${text}`);
-                });
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            hideLoadingSpinner();
+
+            hideLoadingSpinner(); // Hide spinner after response
             if (data.message === 'Data processed successfully.') {
-                captchaCheckbox.checked = true;
-                captchaCheckbox.disabled = true;
-                submitBtn.disabled = false;
+            // If identified as human, check the checkbox and enable submit button
+            captchaCheckbox.checked = true;  // Mark checkbox as checked after success
+            captchaCheckbox.disabled = true;  // Re-enable the checkbox
+            submitBtn.disabled = false;  // Enable submit button
             } else {
-                setupCaptcha();
-                popup.style.display = 'flex';
-                mainContainer.classList.add('blur');
+            // If identified as a bot, show the CAPTCHA popup
+            captchaCheckbox.checked = false;  // Uncheck the checkbox
+            captchaCheckbox.disabled = false;  // Re-enable checkbox
+            setupCaptcha();  // Show CAPTCHA verification
+            popup.style.display = 'flex';  // Show the CAPTCHA popup
+            mainContainer.classList.add('blur');  // Blur the background
             }
         })
         .catch(error => {
-            hideLoadingSpinner();
-            alert(`Error: ${error.message}`);
+            hideLoadingSpinner();  // Stop spinner in case of error
         });
     }
-    
     function showLoadingSpinner() {
         const spinner = document.getElementById('loading-spinner');
         spinner.style.display = 'block';
