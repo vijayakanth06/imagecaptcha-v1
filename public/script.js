@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function sendCursorDataToServer() {
-        fetch('https://imagecaptcha-v1.vercel.app/send-data', {
+        fetch('https://imagecaptcha-v1.onrender.com/send-data', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
