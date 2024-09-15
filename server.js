@@ -72,10 +72,11 @@ app.post('/send-data', (req, res) => {
             console.log('Script output successful');
             const isBot = stdout.includes('Bot detected');
             if (isBot) {
+                console.log('Bot detected');
                 return res.status(403).json({ message: 'Bot detected. Please try again.' });
             } else {
                 console.log('success');
-                res.json({ redirect: 'target.html' });
+                return res.status(200).json({ message: 'Data processed successfully.' });
             }
         });
     });

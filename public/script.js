@@ -184,9 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
     function sendCursorDataToServer() {
-        fetch('http://localhost:3000/send-data', {  // Ensure this matches the port where Express is running
+        fetch('http://localhost:3000/send-data', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -195,29 +194,56 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            } else if (data.message) {
-                alert(data.message);
+
+            hideLoadingSpinner(); // Hide spinner after response
+            if (data.message === 'Data processed successfully.') {
+                // If identified as human, check the checkbox and enable submit button
+                captchaCheckbox.checked = true;  // Mark checkbox as checked after success
+                captchaCheckbox.disabled = true;  // Re-enable the checkbox
+                submitBtn.disabled = false;  // Enable submit button
+            } else {
+                // If identified as a bot, show the CAPTCHA popup
+                captchaCheckbox.checked = false;  // Uncheck the checkbox
+                captchaCheckbox.disabled = false;  // Re-enable checkbox
+                setupCaptcha();  // Show CAPTCHA verification
+                popup.style.display = 'flex';  // Show the CAPTCHA popup
+                mainContainer.classList.add('blur');  // Blur the background
             }
         })
         .catch(error => {
+            hideLoadingSpinner();  // Stop spinner in case of error
+            captchaCheckbox.disabled = false;  // Re-enable checkbox in case of an error
             console.error('Error:', error);
         });
     }
+    function showLoadingSpinner() {
+        const spinner = document.getElementById('loading-spinner');
+        spinner.style.display = 'block';
+        captchaCheckbox.disabled = true;
+    }
 
+    function hideLoadingSpinner() {
+        const spinner = document.getElementById('loading-spinner');
+        spinner.style.display = 'none';
+        if (captchaCheckbox.checked) {
+            captchaCheckbox.style.accentColor = '#007bff'; // Blue color tick
+        }
+    }
+
+    // Captcha checkbox click event
     captchaCheckbox.addEventListener('click', (e) => {
-        if (captchaCheckbox.checked && aadhaarInput.value.length === 12) {
-            popup.style.display = 'flex';
-            setupCaptcha();
-            mainContainer.classList.add('blur');
-            setupCaptcha();
+        if (aadhaarInput.value.length === 12) {
+            // Show loading spinner and disable checkbox during verification
+            showLoadingSpinner();
+            captchaCheckbox.disabled = true;
+            sendCursorDataToServer();  // Verify user with server response
         } else {
             e.preventDefault();
             alert('You must enter 12 numbers.');
-            captchaCheckbox.checked = false;
         }
     });
+    
+    
     // Show the audio CAPTCHA popup
     function showAudioCaptcha() {
         popup.style.display = 'none';
@@ -304,6 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (successfulAudioAttempts >= requiredAttempts) {
                 audioPopup.style.display = 'none';
                 mainContainer.classList.remove('blur');
+                captchaCheckbox.checked = true;  // Mark checkbox as checked after success
+                captchaCheckbox.disabled = true;  // Re-enable the checkbox
                 submitBtn.disabled = false;  // Enable submit button
             } else {
                 setupAudioCaptcha();  // Reset Audio CAPTCHA for the second attempt
@@ -330,19 +358,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    loginForm.addEventListener('submit', (e) => {
-        
-            var honeypot = document.getElementById('honeypot').value;
-            if (honeypot) {
-              // If the honeypot field is filled, prevent form submission
-              event.preventDefault();
-              alert('BOT detected!');
-              location.reload();
-            }
-            else {
-              // If the honeypot field is empty, allow form submission
-              sendCursorDataToServer();
-            }
-          
-    });
+   // Submit button action
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();  // Prevent default form submission
+
+    // Check honeypot for bot detection
+    var honeypot = document.getElementById('honeypot').value;
+    if (honeypot) {
+        alert('BOT detected!');
+        window.location.reload();
+    } else {
+        // Redirect to target page after CAPTCHA pass
+        window.location.href = 'target.html';
+    }
+});
 });
