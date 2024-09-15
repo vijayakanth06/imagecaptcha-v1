@@ -3,9 +3,9 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const port = 3000;  // Port for the Express server
+const port = process.env.PORT || 3000;  // Use environment port for Vercel
 
-// Middleware for parsing JSON request bodies
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -58,8 +58,7 @@ app.post('/send-data', (req, res) => {
     fs.writeFile(filePath, 'x,y,speed\n' + csvData, (err) => {
         if (err) {
             console.error('Error saving CSV:', err);
-            res.status(500).send('Error processing data');
-            return;
+            return res.status(500).send('Error processing data');
         }
 
         // Execute the Python script
