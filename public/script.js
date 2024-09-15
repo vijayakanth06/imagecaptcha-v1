@@ -192,7 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify({ cursorData: cursorData }),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json().catch(error => {
+                throw new Error('Invalid JSON: ' + error.message);
+            });
+        })
         .then(data => {
 
             hideLoadingSpinner(); // Hide spinner after response
@@ -212,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             hideLoadingSpinner();  // Stop spinner in case of error
-            captchaCheckbox.disabled = false;  // Re-enable checkbox in case of an error
             console.error('Error:', error);
         });
     }
