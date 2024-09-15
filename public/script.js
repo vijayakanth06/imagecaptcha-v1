@@ -185,10 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function sendCursorDataToServer() {
-        fetch('http://localhost:3000/send-data', {
+        fetch('/send-data', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
             },
             body: JSON.stringify({ cursorData: cursorData }),
         })
@@ -197,17 +197,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             hideLoadingSpinner(); // Hide spinner after response
             if (data.message === 'Data processed successfully.') {
-                // If identified as human, check the checkbox and enable submit button
-                captchaCheckbox.checked = true;  // Mark checkbox as checked after success
-                captchaCheckbox.disabled = true;  // Re-enable the checkbox
-                submitBtn.disabled = false;  // Enable submit button
+            // If identified as human, check the checkbox and enable submit button
+            captchaCheckbox.checked = true;  // Mark checkbox as checked after success
+            captchaCheckbox.disabled = true;  // Re-enable the checkbox
+            submitBtn.disabled = false;  // Enable submit button
             } else {
-                // If identified as a bot, show the CAPTCHA popup
-                captchaCheckbox.checked = false;  // Uncheck the checkbox
-                captchaCheckbox.disabled = false;  // Re-enable checkbox
-                setupCaptcha();  // Show CAPTCHA verification
-                popup.style.display = 'flex';  // Show the CAPTCHA popup
-                mainContainer.classList.add('blur');  // Blur the background
+            // If identified as a bot, show the CAPTCHA popup
+            captchaCheckbox.checked = false;  // Uncheck the checkbox
+            captchaCheckbox.disabled = false;  // Re-enable checkbox
+            setupCaptcha();  // Show CAPTCHA verification
+            popup.style.display = 'flex';  // Show the CAPTCHA popup
+            mainContainer.classList.add('blur');  // Blur the background
             }
         })
         .catch(error => {
