@@ -16,8 +16,8 @@ def process_file(file_path):
     test_data['y_movement'] = test_data['y'].diff().fillna(0)
 
     # Load the trained model and scaler
-    model = joblib.load('refined_cursor_model.pkl')
-    scaler = joblib.load('refined_scaler.pkl')
+    model = joblib.load('server/cursor_model.pkl')
+    scaler = joblib.load('server/scaler_model.pkl')
 
     # Prepare features and scale the test data
     features = test_data[['x_freq', 'y_freq', 'speed', 'speed_variability', 'acceleration', 'x_movement', 'y_movement']]
@@ -41,6 +41,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     file_path = sys.argv[1]
+    print(f"Processing file: {file_path}")
     final_prediction = process_file(file_path)
 
     # Output the final prediction directly

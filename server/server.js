@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -11,6 +12,7 @@ let requestCount = {};
 const MAX_REQUESTS = 5;
 const BLOCK_DURATION = 3 * 60 * 1000; // Block IP for 3 minutes
 
+// Middleware to handle IP-based rate limiting
 app.use((req, res, next) => {
     const ip = req.ip;
 
@@ -18,7 +20,7 @@ app.use((req, res, next) => {
         if (Date.now() - requestCount[ip].blockedAt > BLOCK_DURATION) {
             // Unblock IP after the duration
             requestCount[ip].blocked = false;
-            requestCount[ip].count = 1;  // Reset request count
+            requestCount[ip].count = 1; // Reset request count
         } else {
             return res.status(403).json({ message: 'Your IP is blocked. Try again later.' });
         }
@@ -38,6 +40,7 @@ app.use((req, res, next) => {
     next();
 });
 
+// Route to handle cursor data processing
 app.post('/send-data', (req, res) => {
     if (!req.body.cursorData) {
         console.error('No cursor data received.');
@@ -60,13 +63,14 @@ app.post('/send-data', (req, res) => {
         }
 
         // Execute the Python script
-        exec(`python3 ${path.join(__dirname, 'predict_with_model.py')} ${filePath}`, (err, stdout, stderr) => {
+        const pythonCommand = process.platform === 'win32' ? 'python' : 'python3';
+        exec(`${pythonCommand} ${path.join(__dirname, 'predict_with_model.py')} ${filePath}`, (err, stdout, stderr) => {
             if (err) {
                 console.error(`Error executing script: ${stderr}`);
                 return res.status(500).json({ message: 'Error processing data.' });
-                window.location.reload();
             }
             console.log('Script output successful');
+
             const isBot = stdout.includes('Bot detected');
             if (isBot) {
                 console.log('Bot detected');
