@@ -1,7 +1,8 @@
 const express = require('express');
-const { exec } = require('child_process');
-const fs = require('fs');
 const path = require('path');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { exec } = require('child_process');
 const app = express();
 const port = 3000;  // Port for the Express server
 
@@ -47,41 +48,34 @@ app.post('/send-data', (req, res) => {
     }
 
     const cursorData = req.body.cursorData;
-    const filePath = path.join(__dirname, 'data.csv');
+    const honeypotValue = req.body.honeypot;
+    
+    // Check honeypot field
+    if (honeypotValue) {
+        return res.json({ message: 'Bot detected' });
+    }
 
-    // Convert cursor data to CSV format
     const csvData = cursorData.map(item => `${item.x},${item.y},${item.speed}`).join('\n');
-   
-    console.log('Saving CSV file...');
+    
+    const fs = require('fs');
+    fs.writeFileSync('data.csv', csvData);
 
-    // Save cursor data to CSV file
-    fs.writeFile(filePath, 'x,y,speed\n' + csvData, (err) => {
-        if (err) {
-            console.error('Error saving CSV:', err);
-            res.status(500).send('Error processing data');
-            return;
+    exec('python3 predict_with_model.py', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing Python script: ${error}`);
+            return res.status(500).json({ message: 'Server error' });
         }
 
-        // Execute the Python script
-        exec(`python3 ${path.join(__dirname, 'predict_with_model.py')} ${filePath}`, (err, stdout, stderr) => {
-            if (err) {
-                console.error(`Error executing script: ${stderr}`);
-                return res.status(500).json({ message: 'Error processing data.' });
-                window.location.reload();
-            }
-            console.log('Script output successful');
-            const isBot = stdout.includes('Bot detected');
-            if (isBot) {
-                console.log('Bot detected');
-                return res.status(403).json({ message: 'Bot detected. Please try again.' });
-            } else {
-                console.log('success');
-                return res.status(200).json({ message: 'Data processed successfully.' });
-            }
-        });
+        console.log('Script output successful');
+        const isBot = stdout.includes('Bot detected');
+        if (isBot) {console.log('Bot detected');
+            return res.json({ message: 'Bot detected' });
+        }
+        console.log('success');
+        return res.json({ message: 'Data processed successfully.' });
     });
 });
 
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running at https://localhost:${port}`);
 });
