@@ -212,8 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             hideLoadingSpinner();  // Stop spinner in case of error
-            captchaCheckbox.disabled = false;  // Re-enable checkbox in case of an error
-            console.error('Error:', error);
         });
     }
     function showLoadingSpinner() {
