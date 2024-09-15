@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function sendCursorDataToServer() {
-        fetch('https://imagecaptcha-v1.onrender.com/send-data', {
+        fetch('/send-data', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
