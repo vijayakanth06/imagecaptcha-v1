@@ -40,7 +40,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post('/send-data', (req, res) => {
+app.post('https://imagecaptcha-v1.vercel.app/send-data', (req, res) => {
     if (!req.body.cursorData) {
         console.error('No cursor data received.');
         return res.status(400).json({ message: 'No data received.' });
