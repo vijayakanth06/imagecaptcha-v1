@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 });
 
 // Route to handle cursor data processing
-app.post('/send-data', (req, res) => {
+export default function handler(req, res) {
     if (!req.body.cursorData) {
         console.error('No cursor data received.');
         return res.status(400).json({ message: 'No data received.' });
@@ -82,7 +82,7 @@ app.post('/send-data', (req, res) => {
             }
         });
     });
-});
+}
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
