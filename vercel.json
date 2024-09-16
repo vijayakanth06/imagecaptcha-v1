@@ -1,9 +1,0 @@
-{
-    "routes": [
-      {
-        "src": "/send-data",
-        "dest": "/api/send-data"
-      }
-    ]
-  }
-  

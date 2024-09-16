@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function sendCursorDataToServer() {
-        fetch('/api/send-data', {
+        fetch('/send-data', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
