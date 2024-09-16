@@ -2,7 +2,7 @@
   "name": "captcha-project",
   "version": "1.0.0",
   "description": "Captcha project with honeypot, IP blocking, and session timeout.",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js"
   },
