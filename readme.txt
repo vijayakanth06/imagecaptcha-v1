@@ -1,7 +1,8 @@
 # Image Captcha v1
 
 ## Overview
-Image Captcha v1 is a simple and effective CAPTCHA system that uses images to verify that the user is human. This project aims to provide an easy-to-implement solution for preventing automated bots from accessing your web applications.
+Image Captcha v1 is a simple and effective CAPTCHA system that uses images to verify that the user is human. This project aims to provide
+an easy-to-implement solution for preventing automated bots from accessing your web applications.
 
 ## Features
 - Easy to integrate into any web application
@@ -12,7 +13,7 @@ Image Captcha v1 is a simple and effective CAPTCHA system that uses images to ve
 ## Installation
 1. Clone the repository:
     ```
-    git clone https://github.com/yourusername/image_captcha-v1.git
+    git clone https://github.com/vijayakanth06/imagecaptcha-v1.git
     ```
 2. Navigate to the project directory:
     ```
@@ -21,13 +22,7 @@ Image Captcha v1 is a simple and effective CAPTCHA system that uses images to ve
 3. Install the required dependencies:
     ```
     npm install
+4. To run:
     ```
+    node server/server.js
 
-## Customization
-You can customize the image set used for the CAPTCHA by modifying the `images` directory. Add or remove images as needed to suit your application's requirements.
-
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
-
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
