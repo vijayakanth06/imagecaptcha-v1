@@ -1,6 +1,6 @@
 const express = require('express');
 const { exec } = require('child_process');
-const cors = require('cors');
+const cors= require('cors');
 const fs = require('fs');
 const path = require('path');
 const app = express();
@@ -12,14 +12,6 @@ app.use(cors());
 let requestCount = {};
 const MAX_REQUESTS = 5;
 const BLOCK_DURATION = 3 * 60 * 1000; // Block IP for 3 minutes
-
-const filePath = path.join(__dirname, 'data.csv');
-
-// Delete the CSV file on server start
-if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    console.log('Existing data.csv deleted to start fresh.');
-}
 
 // Middleware to handle IP-based rate limiting
 app.use((req, res, next) => {
@@ -57,6 +49,7 @@ app.post('/send-data', (req, res) => {
     }
 
     const cursorData = req.body.cursorData;
+    const filePath = path.join(__dirname, 'data.csv');
 
     // Convert cursor data to CSV format
     const csvData = cursorData.map(item => `${item.x},${item.y},${item.speed}`).join('\n');
@@ -84,20 +77,11 @@ app.post('/send-data', (req, res) => {
                 console.log('Bot detected');
                 return res.status(403).json({ message: 'Bot detected. Please try again.' });
             } else {
-                console.log('Success');
+                console.log('success');
                 return res.status(200).json({ message: 'Data processed successfully.' });
             }
         });
     });
-});
-
-// Endpoint to clear the CSV data
-app.get('/', (req, res) => {
-    if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        console.log('data.csv cleared on refresh.');
-    }
-    res.status(200).json({ message: 'Data cleared on refresh.' });
 });
 
 app.listen(port, () => {
