@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="icon" href="download.jpeg" type="image/jpeg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="header">
+            <img src="download.jpeg" alt="Logo">
+        </div>
+        <h2>Login</h2>
+        <form id="loginForm" action="target.html">
+                <input type="text" id="honeypot" name="honeypot" hidden>
+            <input id="aadhaar-input" name="aadno" type="text" placeholder="Enter your username">
+            <input id="pass" type="text" placeholder="Enter your password">
+            <div class="checkbox-container">
+                <div id="loading-spinner" class="spinner" style="display: none;"></div>
+                <input type="checkbox" id="captcha-checkbox">
+                <label for="captcha-checkbox">click to verify you are a human</label>
+            </div>
+            <button type="submit" id="submitBtn" disabled>Login</button>
+        </form>
+    </div>
+
+<div class="popup" id="popup">
+    <div class="popup-content">
+        <div class="captcha-container">
+            
+            <div id="reference-image" class="captcha-image" style="border-color: #007bff;border-width: 8px;"></div>
+            <p>drag the similar image from the below three images and drop it to the target image</p>
+            <div id="option-container" class="option-container"></div>
+        </div>
+        <div id="result-message" class="result-message"></div>
+        <button id="tryAnotherWayBtn">Try Another Way</button>
+    </div>
+</div>
+
+
+<div class="popup" id="audio-popup">
+    <div class="popup-content">
+        <div class="audio-captcha-container">
+            <p>Listen to the audio and select the correct image</p>
+            <audio id="captcha-audio" controls>
+                <source id="audio-source" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+            <div id="audio-option-container" class="option-container"></div>
+        </div>
+        <div id="audio-result-message" class="result-message"></div>
+        <button id="audio-tryAnotherWayBtn">Try Another Way</button>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
